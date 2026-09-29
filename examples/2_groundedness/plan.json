@@ -1,0 +1,98 @@
+{
+  "name": "chunk_fact_support",
+  "description": "Judge which atomic facts are supported by a single retrieved passage.",
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    }
+  },
+  "unit": {
+    "type": "single",
+    "of": "passages"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      }
+    ],
+    "left": {
+      "label": "Passage",
+      "source": "unit"
+    },
+    "right": {
+      "label": "Atomic Statements",
+      "source": "role:facts"
+    }
+  },
+  "questions": [
+    {
+      "id": "supported_facts",
+      "prompt": "Which of the following statements are <strong>fully supported</strong> by the passage?",
+      "widget": "multi_select",
+      "per": "unit",
+      "options_from": "role:facts",
+      "none_option": "None of the above",
+      "required": true,
+      "gold": {
+        "path": "relevance_check.BM25.GPT-5.chunk_fact_relevance",
+        "lookup": "unit",
+        "field": "selected_facts",
+        "value": "enum_index"
+      }
+    }
+  ],
+  "instructions": {
+    "title": "Identify Supported Facts",
+    "summary": "Read a retrieved passage and select all atomic statements that it supports.",
+    "background": "We are evaluating how well individual passages cover specific factual claims. Your task is to determine if the text in the passage provides enough evidence to confirm each statement.",
+    "definitions": [
+      [
+        "Supported",
+        "The passage explicitly states or logically implies the fact without contradiction."
+      ],
+      [
+        "Fully supported",
+        "All parts of the statement (who, what, when) are present in the passage."
+      ]
+    ],
+    "howto": [
+      "Read the question for context.",
+      "Read the passage carefully.",
+      "Check each atomic statement against the passage.",
+      "Select all statements that are fully supported.",
+      "If no statements are supported, select 'None of the above'."
+    ],
+    "tip": "Do not use outside knowledge; rely only on the provided passage."
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 10,
+    "n_hits": 20,
+    "seed": 0,
+    "sampling": "balanced"
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit",
+    "expected": {
+      "supported_facts": "none"
+    }
+  }
+}

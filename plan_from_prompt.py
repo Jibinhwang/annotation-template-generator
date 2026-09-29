@@ -40,7 +40,8 @@ Rules:
 - gold: if DATA CONTEXT contains existing model labels that answer THE SAME question (e.g. relevance_check.*.chunk_fact_relevance
   for "which facts does this passage support"), attach them via question.gold so human answers can be compared with them, and set
   hit.sampling="balanced". If no such labels exist for the question (a new kind of judgment), set gold to null and sampling "random".
-  Never attach labels that answer a different question.
+  Never attach labels that answer a different question. For a multi_select question whose options come from an enumerated role,
+  gold.value MUST be "enum_index" (labels like "Atomic fact3" become option index 2). Use "raw" only for single_choice string labels.
 - Sensible defaults: filters.max_role_size for list roles shown as options (facts ≤ 8, subqueries ≤ 4); hit.n_hits 20 unless told.
 - Copy the user's numbers (top-k, number of HITs, items per HIT) when given. Never invent keys not in the schema.
 - Paths use dot notation exactly as listed in DATA CONTEXT (e.g. relevance_check.BM25.GPT-5.query_chunk_coverage). Never use '/'.
@@ -113,13 +114,21 @@ def data_context(stats, sample):
     return "\n".join(lines)
 
 
-def make_plan(prompt, items, stats, model=None, max_retry=2, log=print, attempts_dir=None):
-    """attempts_dir 를 주면 시도마다 {llm 응답, 검증 오류}를 attempt_N.json 으로 저장 (프롬프트 개선용 진단 로그)."""
+DEFAULT_SHOTS = ("completeness_conciseness", "groundedness_multiselect", "retrieval_coverage", "pairwise_passages")
+
+
+def make_plan(prompt, items, stats, model=None, max_retry=2, log=print, attempts_dir=None, shots=None):
+    """attempts_dir: 시도마다 {llm 응답, 검증 오류}를 attempt_N.json 으로 저장 (프롬프트 개선용 진단 로그).
+    shots: few-shot으로 보여줄 plans/ 이름 리스트. None=기본 4개, []=예시 없이 (일반화 테스트용)."""
     ex = example_plans()
-    # few-shot: 같은 데이터에서 자주 쓰는 3종(gold 포함) + 형식이 다른 예 1개
-    shots = [ex[k] for k in ("completeness_conciseness", "groundedness_multiselect", "retrieval_coverage", "pairwise_passages") if k in ex]
+    names = DEFAULT_SHOTS if shots is None else shots
+    unknown = [n for n in names if n not in ex]
+    if unknown:
+        raise SystemExit(f"--shots 에 없는 plan 이름: {unknown}. 가능한 값: {sorted(ex)}")
+    shots_plans = [ex[k] for k in names]
+    log(f"  few-shot: {list(names) or '(없음)'}")
     user = ("DATA CONTEXT:\n" + data_context(stats, items[0]) +
-            "\n\nEXAMPLE PLANS (for a similar dataset; adapt paths to the DATA CONTEXT above):\n" + json.dumps(shots, ensure_ascii=False) +
+            ("\n\nEXAMPLE PLANS (for a similar dataset; adapt paths to the DATA CONTEXT above):\n" + json.dumps(shots_plans, ensure_ascii=False) if shots_plans else "") +
             "\n\nREQUEST:\n" + prompt)
     msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]
     errs, obj = ["no attempt"], None
@@ -154,11 +163,13 @@ def main():
     ap.add_argument("raw"); ap.add_argument("prompt")
     ap.add_argument("--stats", required=True); ap.add_argument("--out", default="plan.json")
     ap.add_argument("--model"); ap.add_argument("--confirm", action="store_true", help="저장 전에 plan을 보여주고 y/n 확인")
+    ap.add_argument("--shots", nargs="*", default=None, help="few-shot 예시 plan 이름들 (plans/ 파일명). 'none' 이면 예시 없이")
     a = ap.parse_args()
     data = json.load(open(a.raw, encoding="utf-8"))
     items = list(data.values()) if isinstance(data, dict) else data
     stats = json.load(open(a.stats, encoding="utf-8"))
-    plan, rationale = make_plan(a.prompt, items, stats, a.model)
+    shots = None if a.shots is None else ([] if a.shots == ["none"] else a.shots)
+    plan, rationale = make_plan(a.prompt, items, stats, a.model, shots=shots)
     print("--- rationale ---\n" + rationale + "\n--- plan ---\n" + json.dumps(plan, ensure_ascii=False, indent=2))
     if a.confirm and input("이 plan으로 진행할까요? [y/N] ").strip().lower() != "y":
         sys.exit("취소됨")

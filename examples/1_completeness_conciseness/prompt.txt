@@ -1,0 +1,1 @@
+subquery 하나를 보여주고 atomic fact 중 관련 있는 걸 전부 고르게 하고, 그 fact들이 subquery를 Covered하는지 Not covered인지 고르게 하자. BM25, GPT-5 fact, HIT 20개

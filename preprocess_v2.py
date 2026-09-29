@@ -60,7 +60,15 @@ def gold_for(item, q, unit_index=None, rep_count=None):
             return [] if q.get("widget") == "multi_select" else None
         if g.get("field") and isinstance(v, dict):
             v = v.get(g["field"])
-        return _as_value(v, mode)
+        v = _as_value(v, mode)
+        # 다중선택 답은 인덱스 리스트이므로, LLM이 value="raw"로 적었어도 "Atomic fact3" 같은 열거 키는 인덱스로 맞춘다
+        if q.get("widget") == "multi_select" and isinstance(v, list) and v and all(isinstance(x, str) for x in v):
+            conv = [_enum_idx(x) for x in v]
+            if all(c is not None for c in conv):
+                v = sorted(conv)
+        if q.get("widget") == "multi_select" and isinstance(v, (str, int)):
+            v = [v] if isinstance(v, int) else ([_enum_idx(v)] if _enum_idx(v) is not None else [v])
+        return v
 
     lk = g.get("lookup")
     if lk == "unit":

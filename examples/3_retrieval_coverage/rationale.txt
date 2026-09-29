@@ -1,0 +1,2 @@
+(few-shot: 기본 4개)
+The user requested a task where annotators judge which sub-questions a single retrieved passage answers. I selected 'single' unit type based on passages from BM25 top-10. The widget is 'multi_select' with options derived from the 'subqueries' role. Gold attached from query_chunk_coverage.

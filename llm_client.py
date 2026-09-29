@@ -52,11 +52,26 @@ def chat(messages, model=None, purpose="", temperature=0.0, max_tokens=2048, jso
         "Authorization": f"Bearer {key}", "Content-Type": "application/json",
         "HTTP-Referer": "https://github.com/annotation-template-generator", "X-Title": "annotation-template-generator"})
     t0 = time.time()
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            resp = json.loads(r.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"OpenRouter HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:500]}")
+    # 429(rate limit) / 5xx(프로바이더 장애)는 잠시 기다렸다 같은 요청을 다시 보낸다 (plan 재시도 횟수를 소모하지 않음)
+    backoff = [5, 15, 30, 60]
+    for i in range(len(backoff) + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                resp = json.loads(r.read().decode("utf-8"))
+            break
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace")[:500]
+            if e.code in (429, 500, 502, 503, 504) and i < len(backoff):
+                print(f"[llm] HTTP {e.code} — {backoff[i]}s 후 재시도 ({i+1}/{len(backoff)})", file=sys.stderr)
+                time.sleep(backoff[i])
+                req = urllib.request.Request(ENDPOINT, data=req.data, method="POST", headers=dict(req.header_items()))
+                continue
+            raise RuntimeError(f"OpenRouter HTTP {e.code}: {body}")
+        except (urllib.error.URLError, TimeoutError) as e:
+            if i < len(backoff):
+                print(f"[llm] 네트워크 오류 {e} — {backoff[i]}s 후 재시도", file=sys.stderr)
+                time.sleep(backoff[i]); continue
+            raise RuntimeError(f"OpenRouter 연결 실패: {e}")
     choice = resp["choices"][0]
     text = choice["message"].get("content")
     finish = choice.get("finish_reason")

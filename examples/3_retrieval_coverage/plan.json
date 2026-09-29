@@ -1,4 +1,6 @@
 {
+  "name": "retrieval_coverage",
+  "description": "Judge which sub-questions each retrieved passage answers.",
   "id_path": "qid",
   "roles": {
     "question": {
@@ -7,26 +9,10 @@
     "subqueries": {
       "path": "decomposed_query{}"
     },
-    "facts": {
-      "path": "atomic_facts.BM25.GPT-5{}"
-    },
     "passages": {
       "path": "retrieved_chunk.BM25[:10]"
-    },
-    "gt": {
-      "path": "gt_chunk[]"
     }
   },
-  "filters": {
-    "max_role_size": {
-      "facts": 8,
-      "subqueries": 4
-    },
-    "id_prefix": null,
-    "exclude_ids": "auto"
-  },
-  "name": "retrieval_coverage",
-  "description": "passage 하나를 보여주고 그 passage가 답하는 subquery를 모두 선택",
   "unit": {
     "type": "single",
     "of": "passages"
@@ -35,7 +21,7 @@
     "context": [
       {
         "role": "question",
-        "label": "Original question"
+        "label": "Original Question"
       }
     ],
     "left": {
@@ -66,7 +52,7 @@
   "instructions": {
     "title": "Does the passage answer the question?",
     "summary": "Read a <strong>retrieved passage</strong> and mark which <strong>sub-questions</strong> it answers.",
-    "background": "A question was split into sub-questions and a search system retrieved passages for it. We want to know, for each passage, which sub-questions it actually answers.",
+    "background": "A complex question was split into sub-questions. A search system retrieved passages for the original question. We want to know if each passage contains the information needed to answer specific sub-questions.",
     "definitions": [
       [
         "Sub-question",
@@ -74,15 +60,17 @@
       ],
       [
         "Answers",
-        "The passage contains the information needed to answer the sub-question. Mentioning the topic without giving the answer does <strong>not</strong> count."
+        "The passage explicitly states the fact or provides the direct evidence needed to answer the sub-question. Mentioning the topic without giving the answer does <strong>not</strong> count."
       ]
     ],
     "howto": [
-      "Read the sub-question(s), then the passage.",
-      "Tick every sub-question this passage answers, or <em>None</em>.",
-      "Do not use outside knowledge."
+      "Read the original question and the list of sub-questions on the right.",
+      "Read the passage on the left carefully.",
+      "Tick every sub-question that the passage fully answers.",
+      "If the passage answers none of them, select 'None of the sub-questions is answered'.",
+      "Do not use outside knowledge; judge only based on the text provided."
     ],
-    "tip": "A passage about the right entity that never states the asked fact does not answer the question."
+    "tip": "If you had to write an answer to a sub-question using ONLY this passage, could you do it? If yes, tick it."
   },
   "hit": {
     "group_by_item": true,
@@ -90,6 +78,13 @@
     "n_hits": 20,
     "seed": 0,
     "sampling": "balanced"
+  },
+  "filters": {
+    "max_role_size": {
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
   },
   "attention": {
     "strategy": "mismatch",

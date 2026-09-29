@@ -1,0 +1,2 @@
+(few-shot: pairwise_passages, likert_confidence — 이 task와 다른 형식의 예시만 제공)
+I chose unit.type='single' over passages because the request asks to judge one chunk at a time. The widget is multi_select with options_from role:facts to allow selecting multiple supported statements per passage. Gold labels are attached from relevance_check.BM25.GPT-5.chunk_fact_relevance using lookup='unit' to map the current passage index to the corresponding label container, enabling balanced sampling.

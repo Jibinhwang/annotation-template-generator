@@ -24,6 +24,7 @@ def main():
     ap.add_argument("--prompt"); ap.add_argument("--plan")
     ap.add_argument("--out", default="runs/latest_v2"); ap.add_argument("--model")
     ap.add_argument("--confirm", action="store_true", help="LLM이 만든 plan을 보여주고 승인 후 진행")
+    ap.add_argument("--shots", nargs="*", default=None, help="few-shot 예시 plan 이름들. 'none' 이면 예시 없이 (일반화 테스트)")
     ap.add_argument("--open", action="store_true")
     a = ap.parse_args()
     if bool(a.prompt) == bool(a.plan):
@@ -52,7 +53,9 @@ def main():
         print("\n=== 2/4 plan (LLM)")
         from plan_from_prompt import make_plan
         open(os.path.join(d2, "prompt.txt"), "w", encoding="utf-8").write(a.prompt)
-        plan, rationale = make_plan(a.prompt, items, stats, a.model, attempts_dir=os.path.join(d2, "attempts"))
+        shots = None if a.shots is None else ([] if a.shots == ["none"] else a.shots)
+        plan, rationale = make_plan(a.prompt, items, stats, a.model, attempts_dir=os.path.join(d2, "attempts"), shots=shots)
+        open(os.path.join(d2, "shots.txt"), "w", encoding="utf-8").write("\n".join(shots if shots is not None else list(__import__("plan_from_prompt").DEFAULT_SHOTS)))
         open(os.path.join(d2, "rationale.txt"), "w", encoding="utf-8").write(rationale)
         print("--- rationale ---\n" + rationale)
         print(f"--- plan: {plan['name']} | unit={plan['unit']} | questions=" +

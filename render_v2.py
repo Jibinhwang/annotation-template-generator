@@ -4,7 +4,7 @@ render_v2.py — plan + hits.csv → template.html (MTurk) / preview.html (로�
 
     python render_v2.py prep_out/hits.csv --plan plan.json --out render_out [--all-previews]
 
-v1 render.py와 같은 외형(사수 템플릿 구조·CSS)을 쓰되, 화면 구성은 전부 plan.display / plan.questions 에서 온다.
+기존 랩 템플릿의 외형(구조·CSS)을 쓰되, 화면 구성은 전부 plan.display / plan.questions 에서 온다.
 위젯: multi_select, single_choice, likert, free_text.  반복: per="unit" 1회 / per="role:<r>" 그 role 원소마다.
 """
 import argparse, csv, json, os, sys

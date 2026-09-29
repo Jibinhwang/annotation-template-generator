@@ -5,7 +5,7 @@ plan.py — v2의 핵심 객체 "task plan": 어떤 데이터를, 어떤 단위�
 사람이 직접 써도 된다 (plans/ 폴더의 예시 참고). preprocess_v2 / render_v2 는 plan을 실행만 한다.
 
 {
-  "name": "...", "description": "...",
+  "name": "short_slug_name",  "description": "...",     # name: letters/digits/_/- only (hit_id prefix)
   "id_path": "qid",
   "roles": {                                  # 데이터 안의 역할 → 경로 (jsonpath.py 문법)
     "question":   {"path": "query"},                       # 스칼라
@@ -160,12 +160,35 @@ def validate_plan(plan, sample_items=None, known_paths=None):
             if not (isinstance(sc.get("min"), int) and isinstance(sc.get("max"), int) and sc["max"] > sc["min"]):
                 E.append(f"question {qid}: likert needs scale.min < scale.max (ints)")
     ins = plan.get("instructions") or {}
-    for k in ("title", "summary", "howto"):
-        if not ins.get(k):
-            E.append(f"instructions.{k} missing")
+    for k in ("title", "summary"):
+        if not isinstance(ins.get(k), str) or len(ins[k].strip()) < 5:
+            E.append(f"instructions.{k} must be a non-empty string")
+    howto = ins.get("howto")
+    if not isinstance(howto, list) or not howto or not all(isinstance(h, str) and len(h.strip()) >= 5 for h in howto):
+        E.append("instructions.howto must be a list of 3-6 non-empty sentences (strings)")
+    defs = ins.get("definitions", [])
+    if not isinstance(defs, list) or not all(isinstance(d, list) and len(d) == 2 and all(isinstance(x, str) and x.strip() for x in d) for d in defs):
+        E.append("instructions.definitions must be a list of [term, meaning] string pairs")
+    import re as _re
+    if not _re.match(r"^[A-Za-z0-9_\-]+$", str(plan.get("name", ""))):
+        E.append("name must be a short slug: letters, digits, '_' or '-' only (it becomes the hit_id prefix)")
     att = plan.get("attention") or {"strategy": "none"}
     if att.get("strategy", "none") not in ("none", "mismatch"):
         E.append("attention.strategy must be none|mismatch")
+    qmap = {q.get("id"): q for q in qs}
+    for k, v in (att.get("expected") or {}).items():
+        q = qmap.get(k)
+        if not q:
+            continue
+        w = q.get("widget")
+        if w == "multi_select" and not (v == "none" or (isinstance(v, list) and all(isinstance(i, int) for i in v))):
+            E.append(f"attention.expected[{k}]: for multi_select use the literal string \"none\" (or a list of option indices), not the option label")
+        elif w == "single_choice" and v not in (q.get("options") or []):
+            E.append(f"attention.expected[{k}] must be one of options {q.get('options')}")
+        elif w == "likert" and not isinstance(v, int):
+            E.append(f"attention.expected[{k}] must be an integer on the scale")
+        elif w == "free_text" and v is not None:
+            E.append(f"attention.expected[{k}] must be null for free_text")
     if att.get("strategy") == "mismatch":
         sw = att.get("swap", "")
         if not _source_ok(sw, plan, ut != "item"):
@@ -188,6 +211,21 @@ def validate_plan(plan, sample_items=None, known_paths=None):
                 E.append(f"id_path {plan['id_path']!r} not found")
         for q in qs:
             g = q.get("gold")
+            if isinstance(g, dict) and g.get("path") and q.get("widget") == "single_choice" and g.get("value", "raw") == "raw":
+                # gold 라벨 어휘가 선택지 문자열과 정확히 같아야 나중에 사람 답과 비교 가능
+                vocab = set()
+                for it in sample_items:
+                    v = resolve(it, g["path"])
+                    vals = list(v.values()) if isinstance(v, dict) else (v if isinstance(v, list) else [v])
+                    for x in vals:
+                        if g.get("field") and isinstance(x, dict):
+                            x = x.get(g["field"])
+                        if isinstance(x, str):
+                            vocab.add(x)
+                missing = sorted(vocab - set(q.get("options") or []))
+                if vocab and missing:
+                    E.append(f"question {q.get('id')}: gold labels in data are {sorted(vocab)} but options are {q.get('options')} — "
+                             f"options must use exactly these label strings (or set gold to null)")
             if isinstance(g, dict) and g.get("path"):
                 if all(resolve(it, g["path"]) in (None, [], {}) for it in sample_items):
                     hint = _suggest(g["path"], known_paths or [])

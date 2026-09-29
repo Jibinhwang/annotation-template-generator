@@ -1,0 +1,198 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Which statements answer the sub-question, and is it fully answered? — preview</title><style>
+body{margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;line-height:1.7;color:#333;background:#f5f7fa;}
+.entire-UI{max-width:1200px;margin:20px auto;padding:20px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.1);border-radius:12px;}
+.panel-primary{border:1px solid #3b82f6;border-radius:8px;margin-bottom:20px;background:#fff;}
+.panel-heading{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;padding:18px;font-size:22px;text-align:center;border-radius:8px 8px 0 0;}
+.panel-body{padding:18px;} .panel-body h3{margin:18px 0 6px;font-size:16px;}
+.highlight-yellow{background:#fef3c7;padding:8px 12px;border-radius:6px;border-left:4px solid #f59e0b;display:inline-block;}
+.trait-def-box{background:#f8fafc;border:2px solid #c7d2fe;border-radius:10px;padding:14px 18px;margin:8px 0 12px;}
+.trait-def-row{margin-bottom:8px;font-size:14px;line-height:1.6;color:#374151;} .trait-def-row:last-child{margin-bottom:0;}
+.trait-def-label{display:inline-block;font-weight:700;color:#4338ca;min-width:150px;vertical-align:top;} .def-text{display:inline-block;max-width:calc(100% - 160px);}
+.notice-box{padding:12px 16px;border-radius:8px;margin-top:14px;font-size:13.5px;line-height:1.6;}
+.notice-attention{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;} .notice-research{background:#f0fdf4;border:1px solid #86efac;color:#166534;} .notice-tip{background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+#progressBarContainer{width:100%;background:#e5e7eb;margin:10px 0;border-radius:12px;overflow:hidden;}
+#progressBar{width:0%;height:22px;background:linear-gradient(90deg,#10b981,#059669);position:relative;transition:width .4s;border-radius:12px;}
+#progressPercentage{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#fff;font-size:12px;font-weight:700;}
+#submitButton{background:#d1d5db;color:#6b7280;padding:14px 44px;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:not-allowed;transition:all .3s;}
+.btn-enabled{background:linear-gradient(135deg,#3b82f6,#1d4ed8)!important;color:#fff!important;cursor:pointer!important;box-shadow:0 4px 10px rgba(59,130,246,.3);}
+#tabBar{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid #e5e7eb;margin-bottom:14px;}
+.tab-btn{background:#f8fafc;border:1px solid #e5e7eb;border-bottom:none;border-radius:8px 8px 0 0;padding:8px 14px;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;}
+.tab-btn.active{background:#fff;color:#1e40af;border-color:#3b82f6;box-shadow:0 -2px 0 #3b82f6 inset;} .tab-btn.done::after{content:' \2713';color:#10b981;}
+.tab-inner{padding:4px 0;display:flex;flex-direction:column;gap:18px;}
+.tab-title{color:#1e40af;font-size:19px;font-weight:700;margin:0;padding-bottom:8px;border-bottom:2px solid #3b82f6;}
+.prod-card{border:2px solid #e5e7eb;border-radius:14px;overflow:hidden;} .prod-hdr{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;padding:10px 18px;font-weight:600;font-size:15px;} .prod-body{padding:14px 18px;}
+.ctx-query{font-size:16px;font-weight:600;color:#1e293b;} .ctx-sub{margin-top:8px;} .info-k{font-size:.73rem;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.4px;}
+.scripts-side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+.script-card{border:2px solid #e5e7eb;border-radius:14px;overflow:hidden;} .script-card-a{border-color:#f9a8d4;} .script-card-b{border-color:#93c5fd;}
+.script-hdr{color:#fff;padding:10px 16px;font-weight:700;font-size:15px;text-align:center;} .script-card-a-hdr{background:linear-gradient(135deg,#ec4899,#db2777);} .script-card-b-hdr{background:linear-gradient(135deg,#3b82f6,#2563eb);}
+.script-body{padding:14px 18px;font-size:14px;line-height:1.75;color:#1f2937;word-wrap:break-word;max-height:460px;overflow-y:auto;background:#fafbfc;}
+.num-list{margin:0;padding-left:0;list-style:none;} .num-list li{margin:6px 0;display:flex;gap:8px;align-items:flex-start;}
+.chk-idx{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:6px;background:#e0e7ff;color:#3730a3;font-size:12px;font-weight:800;flex:0 0 auto;margin-top:3px;}
+.comp-section{border:2px solid #8b5cf6;border-radius:14px;overflow:hidden;} .comp-section-hdr{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;padding:12px 20px;font-weight:700;font-size:16px;text-align:center;}
+.comp-card{background:#faf5ff;padding:16px 20px;}
+.chk-list{display:flex;flex-direction:column;gap:8px;} .chk-opt{display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px solid #e5e7eb;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:14px;line-height:1.55;transition:all .15s;}
+.chk-opt:hover{border-color:#c4b5fd;} .chk-opt.chk-sel{border-color:#7c3aed;background:#f5f3ff;} .chk-opt input{margin-top:5px;} .chk-none{border-style:dashed;color:#6b7280;} .chk-none.chk-sel{border-color:#dc2626;background:#fef2f2;color:#991b1b;}
+.sq-block{background:#fff;border:2px solid #ddd6fe;border-radius:12px;padding:14px 16px;margin-bottom:14px;} .sq-title{font-size:.8rem;font-weight:800;color:#6d28d9;text-transform:uppercase;letter-spacing:.4px;} .sq-text{font-size:15px;font-weight:600;color:#1e293b;margin:4px 0 10px;} .sq-q{font-size:13.5px;font-weight:600;color:#374151;margin:12px 0 8px;}
+.ab-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;} .ab-opt{cursor:pointer;} .ab-opt input[type=radio]{display:none;}
+.ab-btn{display:inline-block;padding:10px 34px;border-radius:10px;font-weight:700;font-size:15px;border:2px solid #d1d5db;transition:all .2s;color:#374151;background:#f9fafb;}
+.ab-btn-a{border-color:#86efac;color:#166534;background:#f0fdf4;} .ab-btn-b{border-color:#fca5a5;color:#991b1b;background:#fef2f2;}
+.ab-opt.ab-sel .ab-btn-a{background:#16a34a;color:#fff;border-color:#16a34a;} .ab-opt.ab-sel .ab-btn-b{background:#dc2626;color:#fff;border-color:#dc2626;}
+.chunk-details{margin-top:10px;font-size:13px;} .chunk-details summary{cursor:pointer;color:#4338ca;font-weight:600;} .mini-chunk{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;margin-top:6px;}
+#previewOut{display:none;margin-top:20px;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px;} #previewOut pre{margin:0;white-space:pre-wrap;font-size:12px;}
+.preview-banner{background:#fff7ed;border:1px solid #fdba74;color:#9a3412;padding:8px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;}
+@media(max-width:768px){.entire-UI{margin:10px;padding:14px;}.scripts-side-by-side{grid-template-columns:1fr;}.trait-def-label{min-width:0;display:block;}.def-text{max-width:100%;}}
+
+.q-block{background:#fff;border:2px solid #ddd6fe;border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.q-prompt{font-size:15px;font-weight:600;color:#374151;margin-bottom:10px;}
+.rep-item{border-top:1px dashed #e5e7eb;padding:10px 0;} .rep-item:first-of-type{border-top:none;}
+.rep-text{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:#1e293b;margin-bottom:8px;}
+.likert{display:flex;gap:6px;flex-wrap:wrap;align-items:center;} .likert-lbl{font-size:12px;color:#6b7280;margin:0 6px;}
+.lk-opt{cursor:pointer;} .lk-opt input{display:none;} .lk-btn{display:inline-block;min-width:38px;text-align:center;padding:8px 10px;border-radius:8px;border:2px solid #d1d5db;background:#f9fafb;font-weight:700;color:#374151;}
+.lk-opt.ab-sel .lk-btn{background:#7c3aed;color:#fff;border-color:#7c3aed;}
+.ft{width:100%;box-sizing:border-box;min-height:70px;border:2px solid #d1d5db;border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;} .ft:focus{outline:none;border-color:#7c3aed;}
+.ft-count{font-size:12px;color:#6b7280;text-align:right;}
+.sc-row{display:flex;gap:10px;flex-wrap:wrap;} .sc-opt{cursor:pointer;} .sc-opt input{display:none;}
+.sc-btn{display:inline-block;padding:9px 18px;border-radius:9px;border:2px solid #d1d5db;background:#f9fafb;font-weight:700;font-size:14px;color:#374151;}
+.sc-opt.ab-sel .sc-btn{background:#4f46e5;color:#fff;border-color:#4f46e5;}
+.ctx-list{margin:6px 0 0;}
+</style></head><body><section class="entire-UI"><div class="preview-banner"><b>Local preview</b> — one HIT from hits.csv is inlined. Submit shows the answer JSON instead of sending to MTurk.</div>
+<div class="panel panel-primary"><div class="panel-heading"><strong>Instructions</strong></div><div class="panel-body">
+<p><span class="highlight-yellow">For one <strong>sub-question</strong>, mark which <strong>atomic statements</strong> are relevant to it and whether they <strong>fully answer</strong> it.</span></p><h3>Background:</h3><p>A question was split into sub-questions, and a QA system's answer was split into short atomic statements. We measure whether the answer is <em>complete</em> (every sub-question answered) and <em>concise</em> (no statements that answer nothing).</p><h3>Definitions:</h3><div class="trait-def-box"><div class="trait-def-row"><span class="trait-def-label">Sub-question:</span> <span class="def-text">One part of the original question. Often identical to it when the question was not split.</span></div><div class="trait-def-row"><span class="trait-def-label">Atomic statement:</span> <span class="def-text">One short claim taken from the system's answer.</span></div><div class="trait-def-row"><span class="trait-def-label">Relevant:</span> <span class="def-text">The statement gives part or all of the answer to this sub-question. Background that does not answer it is <strong>not</strong> relevant.</span></div><div class="trait-def-row"><span class="trait-def-label">Covered:</span> <span class="def-text">The relevant statements together fully answer the sub-question. If a key piece is missing choose <em>Not covered</em>.</span></div></div>
+<h3>How to Evaluate:</h3><ul><li>Read the original question and the sub-question.</li><li>Tick every relevant statement, or <em>None of the statements is relevant</em>.</li><li>Choose Covered or Not covered.</li><li>Judge from the statements only; do not check whether they are true.</li><li>You must answer every required question before submitting.</li></ul><div class="notice-box notice-tip">&#9733; <strong>Tip:</strong> A sub-question can be <em>Not covered</em> even if some statements are relevant.</div>
+<div class="notice-box notice-attention">&#9888; <strong>Attention Check Notice:</strong> Some items have an obvious answer and are used to check attention. Responses that fail these checks may be <strong>rejected</strong>.</div>
+<div class="notice-box notice-research">&#9888; <strong>Research Use Notice:</strong> Only your responses will be used for academic research purposes.</div>
+</div></div>
+<div class="panel-body"><strong><span style="font-size:12px;">Your current progress</span></strong>
+<div id="progressBarContainer"><div id="progressBar"><span id="progressPercentage">0%</span></div></div></div>
+<div class="panel-body highlight-remaining"><div id="incompleteContent"><strong>&nbsp;</strong></div></div>
+<p style="text-align:center;color:#64748b;font-size:14px;margin:16px 0;">Click the tabs below to navigate between items (11 items).</p>
+<div id="summary-container"><div id="tabBar"></div><div id="tabBody"></div>
+<div style="text-align:center;margin-top:30px;"><button disabled="disabled" id="submitButton" type="button" onclick="handleFormSubmit()">Submit</button></div>
+<div id="previewOut"><b>Submitted answers (what MTurk would receive as <code>input_answers</code>)</b><pre></pre></div></div>
+<script>
+var PLAN={"name": "subquery_fact_relevance_and_coverage_bm25_gpt5", "display": {"context": [{"role": "question", "label": "Original question"}], "left": {"label": "Sub-question", "source": "unit"}, "right": {"label": "Atomic statements (the system's answer)", "source": "role:facts"}}, "questions": [{"id": "relevant", "prompt": "Which statements are <strong>relevant</strong> to this sub-question (give part or all of its answer)?", "widget": "multi_select", "per": "unit", "options_from": "role:facts", "none_option": "None of the statements is relevant", "required": true, "gold": {"path": "relevance_check.BM25.GPT-5.query_fact_relevance", "lookup": "unit", "field": "selected_facts", "value": "enum_index"}}, {"id": "coverage", "prompt": "Taken together, do the statements <strong>fully answer</strong> this sub-question?", "widget": "single_choice", "per": "unit", "options": ["Covered", "Not covered"], "required": true, "gold": {"path": "relevance_check.BM25.GPT-5.query_fact_coverage", "lookup": "unit", "value": "raw"}}], "instructions": {"title": "Which statements answer the sub-question, and is it fully answered?", "summary": "For one <strong>sub-question</strong>, mark which <strong>atomic statements</strong> are relevant to it and whether they <strong>fully answer</strong> it.", "background": "A question was split into sub-questions, and a QA system's answer was split into short atomic statements. We measure whether the answer is <em>complete</em> (every sub-question answered) and <em>concise</em> (no statements that answer nothing).", "definitions": [["Sub-question", "One part of the original question. Often identical to it when the question was not split."], ["Atomic statement", "One short claim taken from the system's answer."], ["Relevant", "The statement gives part or all of the answer to this sub-question. Background that does not answer it is <strong>not</strong> relevant."], ["Covered", "The relevant statements together fully answer the sub-question. If a key piece is missing choose <em>Not covered</em>."]], "howto": ["Read the original question and the sub-question.", "Tick every relevant statement, or <em>None of the statements is relevant</em>.", "Choose Covered or Not covered.", "Judge from the statements only; do not check whether they are true."], "tip": "A sub-question can be <em>Not covered</em> even if some statements are relevant."}};
+var D={"hit_id": "subquery_fact_relevance_and_coverage_bm25_gpt5_0000", "roles": [{"question": "what is the net change in the balance of liability related to employee separations during 2005?", "subqueries": ["What was the balance of the liability related to employee separations at the beginning of 2005?", "What was the balance of the liability related to employee separations at the end of 2005?"], "facts": ["The net change in the balance of liability related to employee separations during 2005 is not disclosed in the provided context."]}, {"question": "when did piracy hit its apex in the caribbean?", "subqueries": ["when did piracy hit its apex in the caribbean?"], "facts": ["Piracy in the Caribbean hit its apex from the 1660s through the 1730s."]}, {"question": "soundcloud rap has been used by which rapper from lauderhill, florida?", "subqueries": ["Which rappers are from Lauderhill, Florida?", "Which rappers have used SoundCloud rap?"], "facts": ["SoundCloud rap has been used by XXXTentacion, a rapper from Lauderhill, Florida."]}, {"question": "what percentage of the beginning balance of 2010 was vested during the year?", "subqueries": ["What was the beginning balance of 2010?", "What dollar amount of the beginning balance of 2010 became vested during 2010?", "Calculate the percentage of the beginning balance of 2010 that became vested during 2010 by dividing the dollar amount of the beginning balance of 2010 that became vested during 2010 by the beginning balance of 2010 and multiplying by 100."], "facts": ["33% of the 2010 beginning balance was vested during the year."]}, {"question": "when did the oldest human occupation of meadowcroft rockshelter occur?", "subqueries": ["when did the oldest human occupation of meadowcroft rockshelter occur?"], "facts": ["The judges listened to the debate for two hours."]}, {"question": "when did the oldest human occupation of meadowcroft rockshelter occur?", "subqueries": ["when did the oldest human occupation of meadowcroft rockshelter occur?"], "facts": ["The oldest human occupation of Meadowcroft Rockshelter occurred circa 14,225 BCE."]}, {"question": "what were the charges against drotleff and canon?", "subqueries": ["What were the charges against drotleff?", "What were the charges against canon?"], "facts": ["Drotleff and Canon were charged with two counts of second-degree murder.", "Drotleff and Canon were charged with one count of attempted murder.", "Drotleff and Canon faced additional weapons charges."]}, {"question": "for 2016 , what percentage of net revenue was due to the retail electric price adjustment?", "subqueries": ["Retrieve the total net revenue for the year 2016.", "Retrieve the amount of revenue attributable to the retail electric price adjustment for the year 2016.", "Calculate the percentage of net revenue for 2016 that is attributable to the retail electric price adjustment using the formula (revenue attributable to the retail electric price adjustment in 2016 / total net revenue in 2016) * 100."], "facts": ["The percentage of 2016 net revenue due to the retail electric price adjustment is not specified in the provided context."]}, {"question": "what is the growth rate in net revenue for entergy mississippi , inc . in 2003?", "subqueries": ["Retrieve net revenue for Entergy Mississippi, Inc. for 2002 and 2003.", "Calculate the growth rate in net revenue for Entergy Mississippi, Inc. in 2003 using the 2002 and 2003 net revenue values."], "facts": ["The growth rate in net revenue for Entergy Mississippi, Inc. in 2003 is not specified in the provided context."]}, {"question": "when did bat out of hell get released?", "subqueries": ["when did bat out of hell get released?"], "facts": ["Bat Out of Hell was released in September 1977."]}, {"question": "what was the percentage rent increase between 2008 and 2009?", "subqueries": ["What was the rent in 2008?", "What was the rent in 2009?", "What was the percentage increase in rent from 2008 to 2009 computed as ((rent in 2009 - rent in 2008) / rent in 2008) * 100?"], "facts": ["The percentage rent increase between 2008 and 2009 was $1,072,000."]}], "unit": [{"value": "What was the balance of the liability related to employee separations at the beginning of 2005?"}, {"value": "when did piracy hit its apex in the caribbean?"}, {"value": "Which rappers have used SoundCloud rap?"}, {"value": "What dollar amount of the beginning balance of 2010 became vested during 2010?"}, {"value": "when did the oldest human occupation of meadowcroft rockshelter occur?"}, {"value": "when did the oldest human occupation of meadowcroft rockshelter occur?"}, {"value": "What were the charges against drotleff?"}, {"value": "Retrieve the amount of revenue attributable to the retail electric price adjustment for the year 2016."}, {"value": "Calculate the growth rate in net revenue for Entergy Mississippi, Inc. in 2003 using the 2002 and 2003 net revenue values."}, {"value": "when did bat out of hell get released?"}, {"value": "What was the rent in 2009?"}]};
+
+function parseList(v){ if (typeof v==='string'){ try{return JSON.parse(v);}catch(e){return [v];} } return Array.isArray(v)?v:[v]; }
+function esc(s){ if(s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escBr(s){ return esc(s).replace(/\n/g,'<br>'); }
+var ROLES=parseList(D.roles), UNITS=parseList(D.unit), N=ROLES.length;
+var DISP=PLAN.display, QS=PLAN.questions;
+
+function idxBadge(i){ return '<span class="chk-idx">'+(i+1)+'</span>'; }
+function renderValue(v){
+  if (Array.isArray(v)){ var h='<ol class="num-list">'; for (var i=0;i<v.length;i++) h+='<li>'+idxBadge(i)+' <span>'+escBr(typeof v[i]==='object'?JSON.stringify(v[i]):v[i])+'</span></li>'; return h+'</ol>'; }
+  if (v && typeof v==='object') return '<pre style="white-space:pre-wrap;margin:0">'+esc(JSON.stringify(v,null,1))+'</pre>';
+  return escBr(v);
+}
+function sourceValue(src, idx){
+  if (src==='unit') return UNITS[idx].value; if (src==='unit.a') return UNITS[idx].a; if (src==='unit.b') return UNITS[idx].b;
+  if (src && src.indexOf('role:')===0) return ROLES[idx][src.slice(5)]; return null;
+}
+function card(cls,title,body){ return '<div class="script-card '+cls+'"><div class="script-hdr '+cls+'-hdr">'+esc(title)+'</div><div class="script-body">'+body+'</div></div>'; }
+
+// ---- 위젯
+function wMulti(name, q, idx){
+  var opts = q.options_from ? (sourceValue(q.options_from, idx)||[]) : (q.options||[]);
+  var h='<div class="chk-list">';
+  for (var i=0;i<opts.length;i++) h+='<label class="chk-opt"><input type="checkbox" name="'+name+'" value="'+i+'">'+idxBadge(i)+'<span class="chk-txt">'+escBr(opts[i])+'</span></label>';
+  if (q.none_option) h+='<label class="chk-opt chk-none"><input type="checkbox" name="'+name+'" value="none"><span class="chk-txt">'+esc(q.none_option)+'</span></label>';
+  return h+'</div>';
+}
+function wSingle(name, q){
+  var h='<div class="sc-row">';
+  for (var i=0;i<q.options.length;i++) h+='<label class="sc-opt" data-name="'+name+'"><input type="radio" name="'+name+'" value="'+esc(q.options[i])+'"><span class="sc-btn">'+esc(q.options[i])+'</span></label>';
+  return h+'</div>';
+}
+function wLikert(name, q){
+  var s=q.scale, h='<div class="likert">'+(s.min_label?'<span class="likert-lbl">'+esc(s.min_label)+'</span>':'');
+  for (var v=s.min; v<=s.max; v++) h+='<label class="lk-opt" data-name="'+name+'"><input type="radio" name="'+name+'" value="'+v+'"><span class="lk-btn">'+v+'</span></label>';
+  return h+(s.max_label?'<span class="likert-lbl">'+esc(s.max_label)+'</span>':'')+'</div>';
+}
+function wText(name, q){ return '<textarea class="ft" name="'+name+'" data-min="'+(q.min_chars||0)+'" placeholder="Type here..."></textarea><div class="ft-count" id="cnt_'+name+'"></div>'; }
+function widget(q, name, idx){
+  if (q.widget==='multi_select') return wMulti(name,q,idx); if (q.widget==='single_choice') return wSingle(name,q);
+  if (q.widget==='likert') return wLikert(name,q); return wText(name,q);
+}
+function reps(q, idx){ // 반복 대상 리스트 (per=unit이면 [null])
+  if (!q.per || q.per==='unit') return [null];
+  var v=sourceValue(q.per, idx); return Array.isArray(v)?v:[v];
+}
+function qname(idx, qi, ri){ return 'q_'+idx+'_'+qi+'_'+ri; }
+
+function buildItem(idx){
+  var ctx='';
+  for (var c=0;c<(DISP.context||[]).length;c++){ var cc=DISP.context[c], v=ROLES[idx][cc.role]; if (v==null) continue;
+    ctx+='<div class="ctx-sub"><span class="info-k">'+esc(cc.label||cc.role)+'</span><div class="'+(Array.isArray(v)?'ctx-list':'ctx-query')+'">'+renderValue(v)+'</div></div>'; }
+  var cards='';
+  if (DISP.left) cards+=card('script-card-a', DISP.left.label||'', renderValue(sourceValue(DISP.left.source, idx)));
+  if (DISP.right) cards+=card('script-card-b', DISP.right.label||'', renderValue(sourceValue(DISP.right.source, idx)));
+  var qh='';
+  for (var qi=0; qi<QS.length; qi++){ var q=QS[qi], rs=reps(q, idx);
+    qh+='<div class="q-block"><div class="q-prompt">'+q.prompt+(q.required===false?' <span style="color:#9ca3af;font-weight:400">(optional)</span>':'')+'</div>';
+    for (var ri=0; ri<rs.length; ri++){
+      qh+='<div class="rep-item">'+(rs[ri]!==null?'<div class="rep-text">'+idxBadge(ri)+'<span>'+escBr(rs[ri])+'</span></div>':'')+widget(q, qname(idx,qi,ri), idx)+'</div>';
+    }
+    qh+='</div>';
+  }
+  return '<div class="tab-inner"><h3 class="tab-title">Item '+(idx+1)+' / '+N+'</h3>'
+    +(ctx?'<div class="prod-card"><div class="prod-body">'+ctx+'</div></div>':'')
+    +(cards?'<div class="scripts-side-by-side"'+(DISP.right?'':' style="grid-template-columns:1fr"')+'>'+cards+'</div>':'')
+    +'<div class="comp-section"><div class="comp-section-hdr">'+esc(PLAN.instructions.title||'Your judgment')+'</div><div class="comp-card">'+qh+'</div></div></div>';
+}
+
+var tabBar=document.getElementById('tabBar'), tabBody=document.getElementById('tabBody');
+for (var i=0;i<N;i++){
+  var b=document.createElement('button'); b.type='button'; b.className='tab-btn'; b.textContent='Item '+(i+1);
+  b.onclick=(function(k){return function(){showTab(k);};})(i); tabBar.appendChild(b);
+  var p=document.createElement('div'); p.className='tab-pane'; p.id='pane_'+i; p.innerHTML=buildItem(i); tabBody.appendChild(p);
+}
+function showTab(k){ var bs=tabBar.children, ps=tabBody.children; for (var i=0;i<N;i++){ bs[i].classList.toggle('active',i===k); ps[i].style.display=(i===k)?'block':'none'; } window.scrollTo(0, tabBar.offsetTop-10); }
+showTab(0);
+
+// ---- 답 읽기 / 완료 판정
+function readOne(q, name){
+  if (q.widget==='multi_select'){ var v=[]; var els=document.querySelectorAll('input[name="'+name+'"]:checked'); for (var i=0;i<els.length;i++) v.push(els[i].value);
+    if (!v.length) return {value:null, done:false}; var none=v.indexOf('none')>=0; return {value: none?[]:v.map(Number), none:none, done:true}; }
+  if (q.widget==='free_text'){ var t=document.querySelector('textarea[name="'+name+'"]'); var s=t?t.value.trim():''; var min=q.min_chars||0;
+    return {value:s, done: q.required===false ? true : s.length>=Math.max(1,min)}; }
+  var r=document.querySelector('input[name="'+name+'"]:checked'); var val=r?(q.widget==='likert'?Number(r.value):r.value):null;
+  return {value:val, done: val!==null};
+}
+function itemAnswer(idx){
+  var out={}, done=true;
+  for (var qi=0; qi<QS.length; qi++){ var q=QS[qi], rs=reps(q, idx), arr=[];
+    for (var ri=0; ri<rs.length; ri++){ var a=readOne(q, qname(idx,qi,ri)); arr.push(a.value); if (q.required!==false && !a.done) done=false; }
+    out[q.id] = (!q.per||q.per==='unit') ? arr[0] : arr;
+  }
+  return {answers:out, done:done};
+}
+function updateProgress(){
+  var done=0, inc=[];
+  for (var i=0;i<N;i++){ if (itemAnswer(i).done) done++; else inc.push(i+1); }
+  var pct=Math.round(done/N*100);
+  document.getElementById('progressBar').style.width=pct+'%'; document.getElementById('progressPercentage').innerText=pct+'%';
+  var btn=document.getElementById('submitButton'); btn.disabled=(done!==N); btn.className=(done===N)?'btn-enabled':'';
+  document.getElementById('incompleteContent').innerHTML = done===N ? '<strong style="color:#10b981;">All items complete! You can now submit.</strong>'
+      : '<strong style="color:#dc2626;">'+(N-done)+' item(s) remaining - incomplete: '+inc.join(', ')+'</strong>';
+  var bs=tabBar.children; for (var i=0;i<N;i++) bs[i].classList.toggle('done', itemAnswer(i).done);
+}
+document.addEventListener('change', onInput); document.addEventListener('input', onInput);
+function onInput(e){
+  var t=e.target; if(!t||!t.name) return;
+  if (t.type==='checkbox'){ var sib=document.querySelectorAll('input[name="'+t.name+'"]');
+    if (t.value==='none' && t.checked){ for (var i=0;i<sib.length;i++) if (sib[i]!==t) sib[i].checked=false; }
+    else if (t.value!=='none' && t.checked){ for (var i=0;i<sib.length;i++) if (sib[i].value==='none') sib[i].checked=false; }
+    for (var i=0;i<sib.length;i++) sib[i].closest('.chk-opt').classList.toggle('chk-sel', sib[i].checked); }
+  if (t.type==='radio'){ var labs=document.querySelectorAll('label[data-name="'+t.name+'"]'); for (var i=0;i<labs.length;i++) labs[i].classList.toggle('ab-sel', labs[i].querySelector('input').checked); }
+  if (t.tagName==='TEXTAREA'){ var c=document.getElementById('cnt_'+t.name); var min=Number(t.getAttribute('data-min')||0); if(c) c.textContent = min? (t.value.trim().length+' / '+min+' chars min') : ''; }
+  updateProgress();
+}
+function collectAnswers(){ var res={hit_id:D.hit_id, plan:PLAN.name, items:[]}; for (var i=0;i<N;i++) res.items.push({item_idx:i, answers:itemAnswer(i).answers}); return res; }
+updateProgress();
+
+
+function handleFormSubmit(){ var out=document.getElementById('previewOut'); out.style.display='block';
+  out.querySelector('pre').textContent=JSON.stringify(collectAnswers(),null,2); out.scrollIntoView({behavior:'smooth'}); }
+</script>
+</section></body></html>

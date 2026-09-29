@@ -1,0 +1,2 @@
+(few-shot: 기본 4개)
+The request is per sub-question: relevant facts (multi_select over atomic facts) plus a Covered / Not covered judgment (single_choice). unit.type=single over subqueries. Gold attached from query_fact_relevance and query_fact_coverage; sampling balanced.

@@ -1,0 +1,102 @@
+{
+  "name": "gt_info_coverage",
+  "description": "Evaluate whether each retrieved chunk contains the key information found in the ground-truth answer chunks.",
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "unit": {
+    "type": "single",
+    "of": "passages"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      },
+      {
+        "role": "gt",
+        "label": "Reference Information (Ground Truth)"
+      }
+    ],
+    "left": {
+      "label": "Retrieved Passage",
+      "source": "unit"
+    }
+  },
+  "questions": [
+    {
+      "id": "has_info",
+      "prompt": "Does this passage contain the <strong>key information</strong> from the Reference?",
+      "widget": "single_choice",
+      "per": "unit",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "required": true,
+      "gold": null
+    },
+    {
+      "id": "missing_info",
+      "prompt": "If 'No', what specific information is missing? (Write a short sentence)",
+      "widget": "free_text",
+      "per": "unit",
+      "min_chars": 10,
+      "required": false
+    }
+  ],
+  "instructions": {
+    "title": "Passage Information Coverage",
+    "summary": "Check if a retrieved passage includes the essential facts present in the reference ground-truth passages.",
+    "background": "We have a question and several 'Reference' passages that definitely contain the correct answer. We also have a 'Retrieved Passage'. Your job is to see if the Retrieved Passage covers the same core information as the References.",
+    "definitions": [
+      [
+        "Key Information",
+        "The specific fact(s) needed to answer the question (e.g., names, dates, numbers)."
+      ],
+      [
+        "Contains",
+        "The passage explicitly states or clearly implies the key information."
+      ]
+    ],
+    "howto": [
+      "Read the Question and the Reference passages to identify the core answer.",
+      "Read the Retrieved Passage carefully.",
+      "Select 'Yes' if the Retrieved Passage provides the core answer.",
+      "Select 'No' if it misses the core answer, then briefly describe what is missing."
+    ],
+    "tip": "Focus on factual coverage. A passage might be about the right topic but miss the specific detail asked for."
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 5,
+    "n_hits": 10,
+    "seed": 0,
+    "sampling": "random"
+  },
+  "filters": {
+    "max_role_size": {
+      "gt": 3
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit",
+    "expected": {
+      "has_info": "No"
+    }
+  }
+}

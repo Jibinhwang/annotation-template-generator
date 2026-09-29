@@ -1,4 +1,4 @@
-"""theme.py — 사수 템플릿(seller_persona) 외형을 그대로 옮긴 공용 CSS."""
+"""theme.py — 기존 랩 annotation 템플릿의 외형을 옮긴 공용 CSS."""
 
 def esc(s):
     return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

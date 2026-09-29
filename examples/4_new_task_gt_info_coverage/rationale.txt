@@ -1,0 +1,2 @@
+(few-shot: pairwise_passages 하나 — 예시 plan 중 이 요청과 같은 것은 없음)
+I chose unit.type='single' over 'retrieved_chunk.BM25[:10]' because the request asks to judge 'each chunk'. The display shows the question and the GT chunks as context so workers can compare against them. Since there are no existing labels for 'does this chunk cover GT info' (the existing relevance_check is about atomic facts), gold is set to null. Attention uses a mismatch strategy where a swapped-in unrelated passage should clearly result in 'No'.

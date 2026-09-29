@@ -1,4 +1,6 @@
 {
+  "name": "subquery_fact_relevance_and_coverage_bm25_gpt5",
+  "description": "BM25/GPT-5 atomic facts를 대상으로, 하나의 subquery와 관련된 fact를 모두 고르고, 해당 fact들이 subquery를 Covered하는지 Not covered인지 판단한다. HIT은 20개로 설정한다.",
   "id_path": "qid",
   "roles": {
     "question": {
@@ -9,24 +11,8 @@
     },
     "facts": {
       "path": "atomic_facts.BM25.GPT-5{}"
-    },
-    "passages": {
-      "path": "retrieved_chunk.BM25[:10]"
-    },
-    "gt": {
-      "path": "gt_chunk[]"
     }
   },
-  "filters": {
-    "max_role_size": {
-      "facts": 8,
-      "subqueries": 4
-    },
-    "id_prefix": null,
-    "exclude_ids": "auto"
-  },
-  "name": "completeness_conciseness",
-  "description": "subquery 하나를 보여주고 관련 atomic fact를 모두 고른 뒤, fact들이 subquery를 커버하는지 판단",
   "unit": {
     "type": "single",
     "of": "subqueries"
@@ -104,7 +90,7 @@
     ],
     "howto": [
       "Read the original question and the sub-question.",
-      "Tick every relevant statement, or <em>None</em>.",
+      "Tick every relevant statement, or <em>None of the statements is relevant</em>.",
       "Choose Covered or Not covered.",
       "Judge from the statements only; do not check whether they are true."
     ],
@@ -116,6 +102,14 @@
     "n_hits": 20,
     "seed": 0,
     "sampling": "balanced"
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
   },
   "attention": {
     "strategy": "mismatch",
