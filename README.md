@@ -1,4 +1,4 @@
-# annot-pipeline
+# annotation-template-generator
 
 **raw 평가 JSON + 자연어 한 문장 → MTurk annotation 템플릿(HTML) + 업로드용 데이터, end-to-end 자동 생성.**
 
@@ -91,7 +91,7 @@ plan 하나에 들어가는 것:
 저장소를 받은 직후 이렇게 놓는다 (`data/`, `.env`, `runs/`는 git에 올라가지 않음):
 
 ```
-annot-pipeline/
+annotation-template-generator/
 ├─ run_pipeline_v2.py, analyze.py, plan.py, ...      ← 코드 (저장소에 포함)
 ├─ plans/                                            ← 예시 plan 7개 (저장소에 포함)
 ├─ .env                 ← 직접 생성: .env.example 복사 후  OPENROUTER_API_KEY=sk-or-...  한 줄
@@ -101,8 +101,8 @@ annot-pipeline/
 ```
 
 ```powershell
-git clone https://github.com/<id>/annot-pipeline.git
-cd annot-pipeline
+git clone https://github.com/<id>/annotation-template-generator.git
+cd annotation-template-generator
 copy .env.example .env        # 메모장으로 열어 키 입력 (cmd: notepad .env)
 mkdir data                    # raw JSON 파일을 data\ 안으로 복사
 ```
