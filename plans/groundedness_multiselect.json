@@ -1,0 +1,103 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "groundedness_multiselect",
+  "description": "passage 하나를 보여주고 그 passage가 지지하는 atomic fact를 모두 선택 (사수 Task 2, groundedness/verifiableness)",
+  "unit": {
+    "type": "single",
+    "of": "passages"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      }
+    ],
+    "left": {
+      "label": "Passage",
+      "source": "unit"
+    },
+    "right": {
+      "label": "Atomic statements",
+      "source": "role:facts"
+    }
+  },
+  "questions": [
+    {
+      "id": "supported",
+      "prompt": "Which statements are <strong>supported</strong> by this passage?",
+      "widget": "multi_select",
+      "per": "unit",
+      "options_from": "role:facts",
+      "none_option": "None of the above is supported",
+      "required": true,
+      "gold": {
+        "path": "relevance_check.BM25.GPT-5.chunk_fact_relevance",
+        "lookup": "unit",
+        "field": "selected_facts",
+        "value": "enum_index"
+      }
+    }
+  ],
+  "instructions": {
+    "title": "Is each statement supported by the passage?",
+    "summary": "Read a <strong>retrieved passage</strong> and mark which <strong>atomic statements</strong> it supports.",
+    "background": "A QA system answered a question using retrieved passages. We split its answer into short atomic statements and want to know which ones each passage can verify on its own.",
+    "definitions": [
+      [
+        "Atomic statement",
+        "One short factual claim from the system's answer."
+      ],
+      [
+        "Supported",
+        "The passage explicitly states the claim or it follows directly. Related-but-unconfirmed is <strong>not</strong> supported."
+      ]
+    ],
+    "howto": [
+      "Read the question, then the passage.",
+      "Tick every supported statement, or <em>None of the above</em>.",
+      "Do not use outside knowledge."
+    ],
+    "tip": "If this passage were the only thing you had read, could you confirm this exact statement?"
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 10,
+    "n_hits": 20,
+    "seed": 0,
+    "sampling": "balanced"
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit",
+    "expected": {
+      "supported": "none"
+    }
+  }
+}

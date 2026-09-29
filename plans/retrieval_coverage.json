@@ -1,0 +1,102 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "retrieval_coverage",
+  "description": "passage 하나를 보여주고 그 passage가 답하는 subquery를 모두 선택 (사수 Task 3, retriever 평가)",
+  "unit": {
+    "type": "single",
+    "of": "passages"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Original question"
+      }
+    ],
+    "left": {
+      "label": "Passage",
+      "source": "unit"
+    },
+    "right": {
+      "label": "Sub-questions",
+      "source": "role:subqueries"
+    }
+  },
+  "questions": [
+    {
+      "id": "answers",
+      "prompt": "Which sub-questions does this passage <strong>answer</strong>?",
+      "widget": "multi_select",
+      "per": "unit",
+      "options_from": "role:subqueries",
+      "none_option": "None of the sub-questions is answered",
+      "required": true,
+      "gold": {
+        "path": "relevance_check.BM25.GPT-5.query_chunk_coverage",
+        "lookup": "unit",
+        "value": "enum_index"
+      }
+    }
+  ],
+  "instructions": {
+    "title": "Does the passage answer the question?",
+    "summary": "Read a <strong>retrieved passage</strong> and mark which <strong>sub-questions</strong> it answers.",
+    "background": "A question was split into sub-questions and a search system retrieved passages for it. We want to know, for each passage, which sub-questions it actually answers.",
+    "definitions": [
+      [
+        "Sub-question",
+        "One part of the original question."
+      ],
+      [
+        "Answers",
+        "The passage contains the information needed to answer the sub-question. Mentioning the topic without giving the answer does <strong>not</strong> count."
+      ]
+    ],
+    "howto": [
+      "Read the sub-question(s), then the passage.",
+      "Tick every sub-question this passage answers, or <em>None</em>.",
+      "Do not use outside knowledge."
+    ],
+    "tip": "A passage about the right entity that never states the asked fact does not answer the question."
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 10,
+    "n_hits": 20,
+    "seed": 0,
+    "sampling": "balanced"
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit",
+    "expected": {
+      "answers": "none"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "pairwise_passages",
+  "description": "passage 두 개를 나란히 놓고 어느 쪽이 질문에 더 잘 답하는지 선택",
+  "unit": {
+    "type": "pair",
+    "of": "passages",
+    "pairing": "adjacent"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      },
+      {
+        "role": "subqueries",
+        "label": "Sub-questions"
+      }
+    ],
+    "left": {
+      "label": "Passage A",
+      "source": "unit.a"
+    },
+    "right": {
+      "label": "Passage B",
+      "source": "unit.b"
+    }
+  },
+  "questions": [
+    {
+      "id": "better",
+      "prompt": "Which passage answers the question <strong>better</strong>?",
+      "widget": "single_choice",
+      "per": "unit",
+      "options": [
+        "Passage A",
+        "Passage B",
+        "Both equally well",
+        "Neither answers it"
+      ],
+      "required": true
+    }
+  ],
+  "instructions": {
+    "title": "Which passage answers the question better?",
+    "summary": "Compare <strong>two retrieved passages</strong> and choose the one that better answers the question.",
+    "background": "A search system retrieved several passages for each question. We want a human judgment of which passages are more useful for answering it.",
+    "definitions": [
+      [
+        "Answers better",
+        "Contains more of the information needed to answer, more directly and completely."
+      ],
+      [
+        "Neither",
+        "Neither passage contains the asked fact, even if both mention the topic."
+      ]
+    ],
+    "howto": [
+      "Read the question (and sub-questions).",
+      "Read both passages fully.",
+      "Pick A, B, both equally, or neither."
+    ],
+    "tip": "Judge only what the passages say; do not rely on your own knowledge of the answer."
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 5,
+    "n_hits": 20,
+    "seed": 0
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit.b",
+    "set": {
+      "unit.a": "role:gt"
+    },
+    "expected": {
+      "better": "Passage A"
+    }
+  }
+}

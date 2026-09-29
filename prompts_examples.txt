@@ -1,0 +1,14 @@
+# run_pipeline_v2.py --prompt 에 넣을 문장 예시 (한 번에 하나)
+
+# 사수 task 1 (completeness / conciseness)
+subquery 하나를 보여주고 atomic fact 중 관련 있는 걸 전부 고르게 하고, 그 fact들이 subquery를 Covered하는지 Not covered인지 고르게 하자. BM25, GPT-5 fact, HIT 20개
+
+# 사수 task 2 (groundedness / verifiableness)
+chunk 하나를 보여주고 atomic fact 중 그 chunk가 지지하는 걸 전부 고르게 하자. BM25 top-10, HIT 20개
+
+# 사수 task 3 (retriever 평가)
+chunk 하나를 보여주고 subquery 중 그 chunk가 답하는 걸 전부 고르게 하자. BM25 top-10, HIT 20개
+
+# 형식이 다른 예
+passage 두 개를 나란히 보여주고 어느 쪽이 질문에 더 잘 답하는지 고르게 하자. HIT 20개
+atomic fact 하나하나에 대해 passage가 지지/모순/무관 중 뭔지 3택으로 받자

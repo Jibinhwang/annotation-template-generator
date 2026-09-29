@@ -1,0 +1,129 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "completeness_conciseness",
+  "description": "subquery 하나를 보여주고 관련 atomic fact를 모두 고른 뒤, fact들이 subquery를 커버하는지 판단 (사수 Task 1)",
+  "unit": {
+    "type": "single",
+    "of": "subqueries"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Original question"
+      }
+    ],
+    "left": {
+      "label": "Sub-question",
+      "source": "unit"
+    },
+    "right": {
+      "label": "Atomic statements (the system's answer)",
+      "source": "role:facts"
+    }
+  },
+  "questions": [
+    {
+      "id": "relevant",
+      "prompt": "Which statements are <strong>relevant</strong> to this sub-question (give part or all of its answer)?",
+      "widget": "multi_select",
+      "per": "unit",
+      "options_from": "role:facts",
+      "none_option": "None of the statements is relevant",
+      "required": true,
+      "gold": {
+        "path": "relevance_check.BM25.GPT-5.query_fact_relevance",
+        "lookup": "unit",
+        "field": "selected_facts",
+        "value": "enum_index"
+      }
+    },
+    {
+      "id": "coverage",
+      "prompt": "Taken together, do the statements <strong>fully answer</strong> this sub-question?",
+      "widget": "single_choice",
+      "per": "unit",
+      "options": [
+        "Covered",
+        "Not covered"
+      ],
+      "required": true,
+      "gold": {
+        "path": "relevance_check.BM25.GPT-5.query_fact_coverage",
+        "lookup": "unit",
+        "value": "raw"
+      }
+    }
+  ],
+  "instructions": {
+    "title": "Which statements answer the sub-question, and is it fully answered?",
+    "summary": "For one <strong>sub-question</strong>, mark which <strong>atomic statements</strong> are relevant to it and whether they <strong>fully answer</strong> it.",
+    "background": "A question was split into sub-questions, and a QA system's answer was split into short atomic statements. We measure whether the answer is <em>complete</em> (every sub-question answered) and <em>concise</em> (no statements that answer nothing).",
+    "definitions": [
+      [
+        "Sub-question",
+        "One part of the original question. Often identical to it when the question was not split."
+      ],
+      [
+        "Atomic statement",
+        "One short claim taken from the system's answer."
+      ],
+      [
+        "Relevant",
+        "The statement gives part or all of the answer to this sub-question. Background that does not answer it is <strong>not</strong> relevant."
+      ],
+      [
+        "Covered",
+        "The relevant statements together fully answer the sub-question. If a key piece is missing choose <em>Not covered</em>."
+      ]
+    ],
+    "howto": [
+      "Read the original question and the sub-question.",
+      "Tick every relevant statement, or <em>None</em>.",
+      "Choose Covered or Not covered.",
+      "Judge from the statements only; do not check whether they are true."
+    ],
+    "tip": "A sub-question can be <em>Not covered</em> even if some statements are relevant."
+  },
+  "hit": {
+    "group_by_item": false,
+    "items_per_hit": 10,
+    "n_hits": 20,
+    "seed": 0,
+    "sampling": "balanced"
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "role:facts",
+    "expected": {
+      "relevant": "none",
+      "coverage": "Not covered"
+    }
+  }
+}

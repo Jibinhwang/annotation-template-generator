@@ -1,0 +1,6 @@
+.env
+llm_usage.jsonl
+__pycache__/
+*.pyc
+runs/
+data/

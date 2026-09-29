@@ -1,0 +1,108 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "missing_info_freetext",
+  "description": "gt passage와 retrieved passage를 비교해 retrieved 쪽에 빠진 정보를 서술",
+  "unit": {
+    "type": "single",
+    "of": "passages"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      }
+    ],
+    "left": {
+      "label": "Reference passage (gold)",
+      "source": "role:gt"
+    },
+    "right": {
+      "label": "Retrieved passage",
+      "source": "unit"
+    }
+  },
+  "questions": [
+    {
+      "id": "missing",
+      "prompt": "Does the retrieved passage miss information from the reference that is needed to answer the question?",
+      "widget": "single_choice",
+      "per": "unit",
+      "options": [
+        "Nothing missing",
+        "Some details missing",
+        "Key information missing"
+      ],
+      "required": true
+    },
+    {
+      "id": "what_missing",
+      "prompt": "Describe what is missing (or write 'nothing').",
+      "widget": "free_text",
+      "per": "unit",
+      "min_chars": 5,
+      "required": true
+    }
+  ],
+  "instructions": {
+    "title": "What does the retrieved passage miss?",
+    "summary": "Compare a <strong>retrieved passage</strong> against the <strong>reference passage</strong> and describe what information needed for the question is missing.",
+    "background": "We know which passage contains the answer (the reference). We want to characterize what retrieved passages lack, to improve the retriever.",
+    "definitions": [
+      [
+        "Reference passage",
+        "A passage known to contain the answer."
+      ],
+      [
+        "Key information missing",
+        "The retrieved passage cannot answer the question at all."
+      ]
+    ],
+    "howto": [
+      "Read the question and the reference passage.",
+      "Read the retrieved passage.",
+      "Choose a category and describe the gap in one or two sentences."
+    ],
+    "tip": "Focus on information relevant to the question, not every difference between the texts."
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 5,
+    "n_hits": 10,
+    "seed": 0
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit",
+    "expected": {
+      "missing": "Key information missing",
+      "what_missing": null
+    }
+  }
+}

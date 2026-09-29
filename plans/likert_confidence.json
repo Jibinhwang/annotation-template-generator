@@ -1,0 +1,111 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "likert_confidence",
+  "description": "query 하나에 fact 전체를 보여주고 fact마다 1~5점 신뢰도 + 한 줄 코멘트",
+  "unit": {
+    "type": "item"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      }
+    ],
+    "left": {
+      "label": "Retrieved passages",
+      "source": "role:passages"
+    },
+    "right": {
+      "label": "Atomic statements",
+      "source": "role:facts"
+    }
+  },
+  "questions": [
+    {
+      "id": "confidence",
+      "prompt": "How confident are you that this statement is correct, given the passages?",
+      "widget": "likert",
+      "per": "role:facts",
+      "scale": {
+        "min": 1,
+        "max": 5,
+        "min_label": "Certainly wrong",
+        "max_label": "Certainly correct"
+      },
+      "required": true
+    },
+    {
+      "id": "comment",
+      "prompt": "Optional: anything that made this question hard to judge?",
+      "widget": "free_text",
+      "per": "unit",
+      "min_chars": 0,
+      "required": false
+    }
+  ],
+  "instructions": {
+    "title": "How confident are you in each statement?",
+    "summary": "Rate each <strong>atomic statement</strong> from 1 to 5 by how confident you are it is correct, using the retrieved passages as evidence.",
+    "background": "We want a graded, not binary, judgment of answer correctness so we can compare it with model confidence.",
+    "definitions": [
+      [
+        "1",
+        "Certainly wrong — the passages contradict it."
+      ],
+      [
+        "3",
+        "Cannot tell from the passages."
+      ],
+      [
+        "5",
+        "Certainly correct — the passages clearly confirm it."
+      ]
+    ],
+    "howto": [
+      "Skim all passages.",
+      "Rate every statement.",
+      "Use 3 when the passages give no evidence either way."
+    ],
+    "tip": "Base the rating on the passages, not on what you already believe."
+  },
+  "hit": {
+    "group_by_item": false,
+    "items_per_hit": 8,
+    "n_hits": 10,
+    "seed": 0
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "role:facts",
+    "expected": {
+      "confidence": 3
+    }
+  }
+}

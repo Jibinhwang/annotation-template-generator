@@ -1,0 +1,103 @@
+{
+  "id_path": "qid",
+  "roles": {
+    "question": {
+      "path": "query"
+    },
+    "subqueries": {
+      "path": "decomposed_query{}"
+    },
+    "facts": {
+      "path": "atomic_facts.BM25.GPT-5{}"
+    },
+    "passages": {
+      "path": "retrieved_chunk.BM25[:10]"
+    },
+    "gt": {
+      "path": "gt_chunk[]"
+    }
+  },
+  "filters": {
+    "max_role_size": {
+      "facts": 8,
+      "subqueries": 4
+    },
+    "id_prefix": null,
+    "exclude_ids": "auto"
+  },
+  "name": "threeway_support",
+  "description": "passage 하나에 대해 fact마다 Supported / Contradicted / Not mentioned 3택",
+  "unit": {
+    "type": "single",
+    "of": "passages"
+  },
+  "display": {
+    "context": [
+      {
+        "role": "question",
+        "label": "Question"
+      }
+    ],
+    "left": {
+      "label": "Passage",
+      "source": "unit"
+    },
+    "right": {
+      "label": "Atomic statements",
+      "source": "role:facts"
+    }
+  },
+  "questions": [
+    {
+      "id": "relation",
+      "prompt": "How does the passage relate to this statement?",
+      "widget": "single_choice",
+      "per": "role:facts",
+      "options": [
+        "Supported",
+        "Contradicted",
+        "Not mentioned"
+      ],
+      "required": true
+    }
+  ],
+  "instructions": {
+    "title": "Does the passage support, contradict, or ignore each statement?",
+    "summary": "For each <strong>atomic statement</strong>, decide whether the passage <strong>supports</strong> it, <strong>contradicts</strong> it, or does <strong>not mention</strong> it.",
+    "background": "We are measuring how faithfully a QA system's answer follows its retrieved evidence, including cases where the evidence says the opposite.",
+    "definitions": [
+      [
+        "Supported",
+        "The passage states the claim or it follows directly."
+      ],
+      [
+        "Contradicted",
+        "The passage states something incompatible with the claim."
+      ],
+      [
+        "Not mentioned",
+        "The passage gives no information either way."
+      ]
+    ],
+    "howto": [
+      "Read the passage once fully.",
+      "For every statement choose exactly one of the three.",
+      "Use only the passage, not outside knowledge."
+    ],
+    "tip": "A statement about a different entity or time than the passage discusses is usually <em>Not mentioned</em>, not <em>Contradicted</em>."
+  },
+  "hit": {
+    "group_by_item": true,
+    "items_per_hit": 10,
+    "n_hits": 20,
+    "seed": 0
+  },
+  "attention": {
+    "strategy": "mismatch",
+    "per_hit": 1,
+    "swap": "unit",
+    "expected": {
+      "relation": "Not mentioned"
+    }
+  }
+}
