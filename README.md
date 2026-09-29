@@ -1,9 +1,11 @@
 # annotation-template-generator
 
-**raw 평가 JSON + 자연어 한 문장 → MTurk annotation 템플릿(HTML) + 업로드용 데이터, end-to-end 자동 생성.**
+**raw 평가 JSON + 자연어 한 문장 → 크라우드소싱 annotation 템플릿(HTML) + 배치 데이터, end-to-end 자동 생성.**
+
+> 자체 annotation 플랫폼용으로 만든다. 현재 `template.html`은 MTurk 호환 형식(`${column}` 자리표시자 + `crowd-form`)이며, 플랫폼 설계가 정해지면 데이터 주입·제출 방식을 그에 맞춰 교체할 예정 (외부 의존이 없는 `preview.html`이 그 출발점).
 
 ```
-python run_pipeline_v2.py raw.json --prompt "chunk 하나를 보여주고 atomic fact 중 그 chunk가 지지하는 걸 전부 고르게 하자. BM25 top-10, HIT 20개" --out runs/groundedness --open
+python run_pipeline_v2.py raw.json --prompt "chunk 하나를 보여주고 atomic fact 중 그 chunk가 지지하는 걸 전부 고르게 하자. BM25 top-10, HIT(작업 묶음) 20개" --out runs/groundedness --open
 ```
 
 이 한 줄이 데이터 구조 분석 → 의도 해석(LLM) → 데이터 정제·HIT 조립 → HTML 생성까지 수행하고, 끝나면 annotator가 보게 될 화면(`preview.html`)이 브라우저로 열린다.
@@ -12,14 +14,16 @@ python run_pipeline_v2.py raw.json --prompt "chunk 하나를 보여주고 atomic
 
 ## 1. 문제
 
-RAG 평가 데이터(query / decomposed subquery / retrieved chunk / atomic fact / LLM 판정)에 대해 사람 annotation을 받으려면, 매번 (1) JSON을 뜯어 원하는 관계를 뽑아 HIT 단위로 자르고 (2) 그에 맞는 MTurk HTML을 손으로 만들어야 했다. 이 저장소는 그 두 작업을 **"무엇을 물을지"를 적은 문장 하나**로 대체한다.
+RAG 평가 데이터(query / decomposed subquery / retrieved chunk / atomic fact / LLM 판정)에 대해 사람 annotation을 받으려면, 매번 (1) JSON을 뜯어 원하는 관계를 뽑아 HIT 단위로 자르고 (2) 그에 맞는 annotation HTML을 손으로 만들어야 했다. 이 저장소는 그 두 작업을 **"무엇을 물을지"를 적은 문장 하나**로 대체한다.
 
 | 입력 | 출력 |
 |---|---|
-| raw JSON (구조를 미리 알 필요 없음) | `hits.csv` — MTurk 업로드용 데이터 (1행 = 1 HIT, LLM 라벨 gold 포함) |
-| prompt — annotation 목적 (한국어/영어) | `template.html` — MTurk 템플릿, `preview.html` — 로컬 미리보기 |
+| raw JSON (구조를 미리 알 필요 없음) | `hits.csv` — 플랫폼에 올릴 배치 데이터 (1행 = 1 HIT, LLM 라벨 gold 포함) |
+| prompt — annotation 목적 (한국어/영어) | `template.html` — 플랫폼용 템플릿(데이터 자리표시자), `preview.html` — 로컬 미리보기 |
 
 ---
+
+> 용어: **HIT** = 작업자 한 명이 한 번에 받아 제출하는 항목 묶음(MTurk 용어를 그대로 씀). 1 HIT = `hits.csv` 1행 = 화면의 탭 묶음 하나.
 
 ## 2. 전체 로직
 
@@ -28,7 +32,7 @@ raw.json ──① analyze.py──▶ stats.json ─┐
                                        ├──② plan_from_prompt.py (LLM)──▶ plan.json  ←(사람 승인: --confirm)
 prompt ────────────────────────────────┘
 raw.json + plan.json ──③ preprocess_v2.py──▶ hits.csv, units.jsonl, manifest.json
-hits.csv + plan.json ──④ render_v2.py─────▶ template.html (MTurk) / preview.html (로컬)
+hits.csv + plan.json ──④ render_v2.py─────▶ template.html (플랫폼용) / preview.html (로컬)
 ```
 
 핵심 원칙은 **LLM은 판단만 하고 실행은 하지 않는다**는 것이다. LLM이 쓰는 것은 `plan.json` 하나뿐이고, 데이터를 자르고 HTML을 그리는 일은 전부 결정론적 코드가 plan을 읽어서 수행한다. 그래서 같은 입력이면 같은 결과가 나오고, 틀리면 plan.json 한 곳만 고쳐 `--plan`으로 다시 돌리면 된다.
@@ -74,9 +78,9 @@ plan 하나에 들어가는 것:
 
 외형(Instructions 패널 → 진행률 → 항목 탭 → 맥락 카드 → 좌/우 카드 → 질문 → Submit)은 기존 랩 템플릿을 따르고, 내용은 전부 plan에서 읽는다. 위젯은 `multi_select`(None 옵션, 상호배제) / `single_choice` / `likert` / `free_text`. 모든 필수 질문에 답해야 Submit이 켜지고, 답은 `input_answers` 하나에 JSON으로 묶여 나간다.
 
-- `template.html`: 데이터 자리에 `${roles}`, `${unit}` 자리표시자 → MTurk가 `hits.csv` 행으로 채움
+- `template.html`: 데이터 자리에 `${roles}`, `${unit}` 자리표시자 → 플랫폼이 `hits.csv` 행으로 치환 (현재는 MTurk 호환 문법)
 - `preview.html`: HIT 1개를 인라인 → 더블클릭으로 열림, Submit하면 답 JSON 표시
-- **보안**: template에는 `roles / unit / hit_id`만 들어간다. `src_id / is_attention / gold / expected`는 CSV에만 있어 작업자가 소스를 봐도 attention 위치와 정답을 알 수 없다. MTurk 결과에는 input 컬럼이 따라오므로 `item_idx`로 join하면 된다.
+- **보안**: template에는 `roles / unit / hit_id`만 들어간다. `src_id / is_attention / gold / expected`는 CSV에만 있어 작업자가 소스를 봐도 attention 위치와 정답을 알 수 없다. 결과를 받을 때 `hit_id` + `item_idx`로 `hits.csv`와 join하면 된다.
 
 ---
 
@@ -144,7 +148,7 @@ python llm_client.py
 4_render/template.html, preview.html, preview_all/
 pipeline_summary.json
 ```
-- **MTurk 업로드** = `4_render/template.html`(Design Layout에 붙여넣기) + `3_prep/hits.csv`(Publish Batch에서 업로드).
+- **플랫폼에 올릴 것** = `4_render/template.html`(템플릿) + `3_prep/hits.csv`(배치 데이터). MTurk 호환 플랫폼이면 그대로, 자체 플랫폼이면 자리표시자 치환 + `input_answers` 수신만 구현하면 된다.
 - 문구나 설정을 고치고 싶으면 `2_plan/plan.json`을 편집한 뒤 `--plan runs\이름\2_plan\plan.json` 으로 재실행 (LLM 재호출 없음).
 - 단계별로 따로 돌릴 수도 있다: `analyze.py raw --out d` → `plan_from_prompt.py raw "…" --stats d/stats.json --out plan.json` → `preprocess_v2.py raw --plan plan.json --stats d/stats.json --out p` → `render_v2.py p/hits.csv --plan plan.json --out r`.
 
@@ -180,4 +184,4 @@ pipeline_summary.json
 - gold는 LLM이 plan에 경로를 적어야 붙는다. 데이터 컨텍스트에 gold 후보를 명시해 두었지만, 빠뜨리면 `--confirm`에서 보고 plan.json에 추가하면 된다.
 - 위젯 4종. 순위 매기기·텍스트 하이라이트 등은 추가 구현 필요.
 - Instructions의 정의("Supported", "Covered" 등)는 LLM 초안이다. 랩의 기준 문서가 있으면 plan에 고정해 넣는 것이 맞다.
-- MTurk 결과 채점(attention 통과율, 사람–LLM 일치도, 작업자 간 일치도)은 아직 없다 — `units.jsonl`의 gold/expected와 `input_answers`를 `item_idx`로 join하면 된다.
+- annotation 결과 채점(attention 통과율, 사람–LLM 일치도, 작업자 간 일치도)은 아직 없다 — `units.jsonl`의 gold/expected와 `input_answers`를 `item_idx`로 join하면 된다.
